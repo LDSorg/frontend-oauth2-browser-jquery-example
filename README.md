@@ -63,12 +63,14 @@ For convenience, we provider fully working test API keys that you can test with 
 
 ### Facebook Connect
 
- * Authorization URL: https://www.facebook.com/dialog/oauth
- * Token URL: https://graph.facebook.com/oauth/access_token
- * Profile URL: https://graph.facebook.com/me
- * App ID: 746913342088510
- * App Secret: ad539732cbfbd60169f32336e257b37c
- * Callback URL: http://local.foobar3000.com:4080
+| Param | Value |
+|:------|:------|
+|Authorization URL | https://www.facebook.com/dialog/oauth |
+ | Token URL | https://graph.facebook.com/oauth/access_token |
+ | Profile URL | https://graph.facebook.com/me |
+ | App ID|  746913342088510 |
+ | App Secret| ad539732cbfbd60169f32336e257b37c |
+ | Callback URL | http://local.foobar3000.com:4080 |
 
 ### LDS Connect
 
