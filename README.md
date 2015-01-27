@@ -1,16 +1,14 @@
 OAuth2 jQuery
 =============
 
-An example for using OAuth2 (Facebook Connect) with LDS Connect and jQuery
+This is a template for gracefully handling the browser component of **server-side** OAuth2 for use with Facebook Connect and/or LDS Connect and jQuery - so that you can focus on building your backend (in ruby, python, node/io.js, etc) and know that you have a working front-end.
 
-If you want this example + node.js / io.js see
+If you'd like to see this front-end in action with a zero-config (download and run) example, see
 [passport-lds-connect-example](https://github.com/LDSorg/passport-lds-connect-example)
 
-This is a template for gracefully handling the browser component of **server-side** OAuth2.
-
-Although it does rely on a server, you can remove the server redirects so that you
-provide your users with a seamless experience that doesn't disrupt their flow in
-your application.
+Although it does rely on a server, you will implement your API using without the old-school server redirects
+so that you provide your users with a seamless experience that doesn't disrupt their flow in your application.
+(because it sucks when you want to use funcitonality that requires login and get thrown out of your flow)
 
 Implement this API
 ===
