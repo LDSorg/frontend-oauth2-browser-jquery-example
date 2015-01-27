@@ -17,7 +17,7 @@ API
 
 For this example you must create a server that implements the following endpoints:
 
-(replace provider with `facebook` or `ldsconnect` appropriately)
+(replace `{{provider}}` with `facebook` or `ldsconnect` appropriately)
 
 /auth/{{provider}}
 --------------
