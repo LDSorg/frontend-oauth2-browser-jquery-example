@@ -76,17 +76,20 @@ For convenience, we provider fully working test API keys that you can test with 
 
 OAuth2 URLs and API Keys
 
- * Authorization URL: https://ldsconnect.org/dialog/authorize
- * Token URL: https://ldsconnect.org/oauth/token
- * Profile URL: https://ldsconnect.org/api/ldsconnect/me
- * App ID: 55c7-test-bd03
- * App Secret: 6b2fc4f5-test-8126-64e0-b9aa0ce9a50d
- * Callback URL: https://local.ldsconnect.org:8043
+| OAuth2 Param     | Value                                         |
+|:------           |:------                                        |
+|Authorization URL | https://ldsconnect.org/dialog/authorize       |
+| Token URL        | https://ldsconnect.org/oauth/token            |
+| Profile URL      | https://ldsconnect.org/api/ldsconnect/me      |
+| App ID           | 55c7-test-bd03                                |
+| App Secret       | 6b2fc4f5-test-8126-64e0-b9aa0ce9a50d          |
+| Callback URL     | https://local.ldsconnect.org:8043             |
+
 
 Your LDS Account will not be able to login to test applications. You must use:
 
-  * username: dumbledore
-  * passphrase: secret
+| username   | dumbledore |
+| passphrase | secret     |
 
 You will need to use TLS/SSL with HTTPS in order to register your production app. Start by testing your app with these certificates. Then watch the video to see how to purchase your own.
 
