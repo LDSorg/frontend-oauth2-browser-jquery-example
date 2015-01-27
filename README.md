@@ -96,9 +96,9 @@ You will need to use TLS/SSL with HTTPS in order to register your production app
 
 | Certificate         | PEM File |
 |:--------------------|:---------|
-| root ca public crt  | [https://github.com/LDSorg/passport-lds-connect-example/blob/master/certs/server/my-root-ca.crt.pem](my-root-ca.crt.pem) |
-| server public crt   | [https://github.com/LDSorg/passport-lds-connect-example/blob/master/certs/server/my-server.crt.pem](my-server.crt.pem) |
-| server private key  | [https://github.com/LDSorg/passport-lds-connect-example/blob/master/certs/server/my-server.key.pem](my-server.key.pem) |
+| root ca public crt  | [my-root-ca.crt.pem](https://github.com/LDSorg/passport-lds-connect-example/blob/master/certs/server/my-root-ca.crt.pem) |
+| server public crt   | [my-server.crt.pem](https://github.com/LDSorg/passport-lds-connect-example/blob/master/certs/server/my-server.crt.pem) |
+| server private key  | [my-server.key.pem](https://github.com/LDSorg/passport-lds-connect-example/blob/master/certs/server/my-server.key.pem) |
 
 Screencast: Getting SSL Certs with Name.com (not yet uploaded)
 
