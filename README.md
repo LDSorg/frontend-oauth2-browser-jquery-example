@@ -88,6 +88,8 @@ OAuth2 URLs and API Keys
 
 Your LDS Account will not be able to login to test applications. You must use:
 
+|            |            |
+|------------|------------|
 | username   | dumbledore |
 | passphrase | secret     |
 
