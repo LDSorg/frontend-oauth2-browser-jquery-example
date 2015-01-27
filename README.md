@@ -15,7 +15,7 @@ your application.
 API
 ===
 
-For this example you must create a server that implements the following endpoints:
+For this example **you must implement these endpoints** in your the server you create:
 
 (replace `{{provider}}` with `facebook` or `ldsconnect` appropriately)
 
