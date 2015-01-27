@@ -12,7 +12,7 @@ Although it does rely on a server, you can remove the server redirects so that y
 provide your users with a seamless experience that doesn't disrupt their flow in
 your application.
 
-API
+Implement this API
 ===
 
 For this example **you must implement these endpoints** in your the server you create:
@@ -54,7 +54,7 @@ session info based on the success or failure indicated in the url
 `https://example.com/auth/facebook/callback?error=NOT_AUTHORIZED`
 instead of having a code).
 
-API Tokens
+Use these API Tokens
 ----------
 
 For convenience, we provider fully working test API keys that you can test with on localhost. Get your example working first with Facebook, then substite the appropriate strings with LDS Connect.
