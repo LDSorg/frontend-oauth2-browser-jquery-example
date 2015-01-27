@@ -63,8 +63,8 @@ For convenience, we provider fully working test API keys that you can test with 
 
 ### Facebook Connect
 
-| Param | Value |
-|:------|:------|
+| OAuth2 Param     | Value                                         |
+|:------           |:------                                        |
 |Authorization URL | https://www.facebook.com/dialog/oauth         |
 | Token URL        | https://graph.facebook.com/oauth/access_token |
 | Profile URL      | https://graph.facebook.com/me                 |
