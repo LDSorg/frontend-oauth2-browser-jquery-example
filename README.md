@@ -27,7 +27,7 @@ Examples:
 * /auth/facebook
 * /auth/ldsconnect
 
-This will set some options and redirect to
+The endpoint you create for these may set some options in your OAuth2 library and will then redirect to
 
   * (facebook) https://www.facebook.com/dialog/oauth
   * (ldsconnect) https://ldsconnect.org/dialog/authorize
