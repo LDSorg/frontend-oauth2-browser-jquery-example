@@ -17,18 +17,29 @@ API
 
 For this example you must create a server that implements the following endpoints:
 
-(replace `facebook` with `ldsconnect` for lds connect)
+(replace provider with `facebook` or `ldsconnect` appropriately)
 
-/auth/facebook (/auth/ldsconnect)
+/auth/{{provider}}
 --------------
+
+Examples:
+
+* /auth/facebook
+* /auth/ldsconnect
 
 This will set some options and redirect to
 
   * (facebook) https://www.facebook.com/dialog/oauth
   * (ldsconnect) https://ldsconnect.org/dialog/authorize
 
-/auth/facebook/callback
+/auth/{{provider}}/callback
 -----------------------
+
+Examples:
+
+* /auth/facebook/callback
+* /auth/ldsconnect/callback
+
 
 This is the endpoint to which facebook (or lds connect) will respond with your
 grant code (`https://example.com/auth/facebook/callback?code=xxxxxxxxxxxx`).
@@ -43,8 +54,48 @@ session info based on the success or failure indicated in the url
 `https://example.com/auth/facebook/callback?error=NOT_AUTHORIZED`
 instead of having a code).
 
+API Tokens
+----------
+
+For convenience, we provider fully working test API keys that you can test with on localhost. Get your example working first with Facebook, then substite the appropriate strings with LDS Connect.
+
+**Note**: These examples **will not work** with `127.0.0.1:3000` or `localhost:300` (even though they must run locally), you must use the appropriate domain name and port (which point to `127.0.0.1`).
+
+### Facebook Connect
+
+ * Authorization URL: https://www.facebook.com/dialog/oauth
+ * Token URL: https://graph.facebook.com/oauth/access_token
+ * Profile URL: https://graph.facebook.com/me
+ * App ID: 746913342088510
+ * App Secret: ad539732cbfbd60169f32336e257b37c
+ * Callback URL: http://local.foobar3000.com:4080
+
+### LDS Connect
+
+OAuth2 URLs and API Keys
+
+ * Authorization URL: https://ldsconnect.org/dialog/authorize
+ * Token URL: https://ldsconnect.org/oauth/token
+ * Profile URL: https://ldsconnect.org/api/ldsconnect/me
+ * App ID: 55c7-test-bd03
+ * App Secret: 6b2fc4f5-test-8126-64e0-b9aa0ce9a50d
+ * Callback URL: https://local.ldsconnect.org:8043
+
+Your LDS Account will not be able to login to test applications. You must use:
+
+  * username: dumbledore
+  * passphrase: secret
+
+You will need to use TLS/SSL with HTTPS in order to register your production app. Start by testing your app with these certificates. Then watch the video to see how to purchase your own.
+
+  * root ca public crt: https://github.com/LDSorg/passport-lds-connect-example/blob/master/certs/server/my-root-ca.crt.pem
+  * server public crt: https://github.com/LDSorg/passport-lds-connect-example/blob/master/certs/server/my-server.crt.pem
+  * server private key: https://github.com/LDSorg/passport-lds-connect-example/blob/master/certs/server/my-server.key.pem
+
+Screencast: Getting SSL Certs with Name.com (not yet uploaded)
+
 FIY: Server-Side vs Client-Only OAuth2
-==============
+---------------
 
 Just an FYI for the curious...
 
