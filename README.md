@@ -88,10 +88,9 @@ OAuth2 URLs and API Keys
 
 Your LDS Account will not be able to login to test applications. You must use:
 
-|            |            |
+| test user  | passphrase |
 |------------|------------|
-| username   | dumbledore |
-| passphrase | secret     |
+| dumbledore | secret     |
 
 You will need to use TLS/SSL with HTTPS in order to register your production app. Start by testing your app with these certificates. Then watch the video to see how to purchase your own.
 
