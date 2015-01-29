@@ -94,7 +94,7 @@ You will need to use TLS/SSL with HTTPS in order to register your production app
 
 | Certificate         | PEM File |
 |:--------------------|:---------|
-| root ca public crt  | [intermediate.crt.pem](https://raw.githubusercontent.com/LDSorg/passport-lds-connect-example/master/certs/ca/intermediate.crt.pem) |
+| intermediate ca public crt  | [intermediate.crt.pem](https://raw.githubusercontent.com/LDSorg/passport-lds-connect-example/master/certs/ca/intermediate.crt.pem) |
 | server public crt   | [my-server.crt.pem](https://github.com/LDSorg/passport-lds-connect-example/blob/master/certs/server/my-server.crt.pem) |
 | server private key  | [my-server.key.pem](https://github.com/LDSorg/passport-lds-connect-example/blob/master/certs/server/my-server.key.pem) |
 
