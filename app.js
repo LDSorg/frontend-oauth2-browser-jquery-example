@@ -24,9 +24,14 @@ $(function () {
     // handling this in the browser instead of on the server
     // means swapping a redirect for an http request,
     // so don't believe an fanatic's fallacy that this is slower.
-    window.completeLogin = function (/*name, href*/) {
+    window.completeLogin = function (name, href) {
       // name can be used to disambiguate if you have multiple login strategies
       // href will contain 'code', 'token', or an error you may want to display to the user
+      if (!/code=/.test(href)) {
+        window.alert("Looks like the login failed for " + name + "!");
+        return;
+      }
+
       testLogin();
     };
 
@@ -42,7 +47,12 @@ $(function () {
 
   // all the comments above apply here as well, of course
   $('.js-open-ldsconnect-login').click('body', function () {
-    window.completeLogin = function (/*name, href*/) {
+    window.completeLogin = function (name, href) {
+      if (!/code=/.test(href)) {
+        window.alert("Looks like the login failed for " + name + "!");
+        return;
+      }
+
       testLogin();
     };
     window.open('/auth/ldsconnect');
