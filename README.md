@@ -1,14 +1,98 @@
 OAuth2 jQuery
 =============
 
-This is a template for gracefully handling the browser component of **server-side** OAuth2 for use with Facebook Connect and/or LDS Connect and jQuery - so that you can focus on building your backend (in ruby, python, node/io.js, etc) and know that you have a working front-end.
+An example for using OAuth2 (Facebook Connect) with LDS Connect and jQuery
 
-If you'd like to see this front-end in action with a zero-config (download and run) example, see
-[passport-lds-connect-example](https://github.com/LDSorg/passport-lds-connect-example)
+This is a template for gracefully handling the browser component of **server-side** OAuth2.
 
-Although it does rely on a server, you will implement your API using without the old-school server redirects
-so that you provide your users with a seamless experience that doesn't disrupt their flow in your application.
-(because it sucks when you want to use funcitonality that requires login and get thrown out of your flow)
+Although it does rely on a server, you can remove the server redirects so that you
+provide your users with a seamless experience that doesn't disrupt their flow in
+your application.
+
+Screencast
+==========
+
+See <https://youtu.be/PSVsKcCnPF4>.
+
+Zero-Config Install and Run
+================
+
+You can start working with test user data immediately.
+
+1. Clone Backend
+----------------
+
+If you haven't already, clone a backend first
+
+```bash
+git clone git@github.com:LDSorg/passport-lds-connect-example.git
+
+pushd passport-lds-connect-example
+
+npm install
+```
+
+2. Clone Frontend
+-----------------
+
+You need to clone the frontend 
+
+See [github.com/ldsorg](https://github.com/ldsorg?query=oauth2-) for a list of frontends examples / seed projects.
+
+```bash
+# The jQuery Example
+git clone git@github.com:LDSorg/oauth2-jquery public
+```
+
+3. Run Server
+-------------
+
+```bash
+node ./serve.js
+```
+
+4. Go to <https://local.ldsconnect.org:8043>
+----------
+
+**This domain points to YOUR computer**.
+
+**DO NOT USE 127.0.0.1 or localhost**.
+
+<https://local.ldsconnect.org:8043> uses a valid SSL certificate for
+HTTPS and points to 127.0.0.1.
+
+Even in development you should never be using insecure connections.
+Welcome to 2015. [Get used to it](https://letsencrypt.org)!
+
+The development test keys are already installed. Once you've fired up the server navigate to <https://local.ldsconnect.org:8043>.
+
+**Note**:
+It's important that you use `local.ldsconnect.org` rather than `localhost`
+because the way that many OAuth2 implementations validate domains requires
+having an actual domain. Also, you will be testing with **SSL on** so that
+your development environment mirrors your production environment.
+
+5. Login as dumbledore
+-----------
+
+You **cannot** login as a real lds.org user as a test application.
+If you try, you will get an error.
+
+The login you must use for test applications is `dumbledore` with the passphrase `secret`.
+
+Create a Backend in your Favorite Language
+=====
+
+1. Create a backend in the language of your choice
+2. Follow the API outlined below
+3. Clone this project as your public folder
+4. Run your server, serving the public folder staticly
+
+And remember:
+
+```bash
+bower install
+```
 
 Implement this API
 ===
@@ -98,10 +182,13 @@ You will need to use TLS/SSL with HTTPS in order to register your production app
 | server public crt   | [my-server.crt.pem](https://github.com/LDSorg/passport-lds-connect-example/blob/master/certs/server/my-server.crt.pem) |
 | server private key  | [my-server.key.pem](https://github.com/LDSorg/passport-lds-connect-example/blob/master/certs/server/my-server.key.pem) |
 
-Screencast: Getting SSL Certs with Name.com (not yet uploaded)
+Screencast: SSL Certificates
+----------
+
+[Getting SSL Certs with Name.com](https://www.youtube.com/watch?v=r92gqYHJc5c)
 
 FIY: Server-Side vs Client-Only OAuth2
----------------
+==============
 
 Just an FYI for the curious...
 
