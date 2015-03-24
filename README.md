@@ -1,18 +1,20 @@
-OAuth2 jQuery
-=============
+Implicit (Client-Side) OAuth2 jQuery
+====================================
 
-An example for using OAuth2 (Facebook Connect) with LDS Connect and jQuery
+An example for using the Implicit Grant OAuth2 strategy (Facebook Connect)
+with LDS Connect and jQuery.
 
-This is a template for gracefully handling the browser component of **server-side** OAuth2.
+Implicit Grant (`response_type=token`) is the correct solution for
 
-Although it does rely on a server, you can remove the server redirects so that you
-provide your users with a seamless experience that doesn't disrupt their flow in
-your application.
+  * Browser Apps
+  * Mobile Apps with WebView
+  * Desktop Clients with WebView
+  * Non-secure Environments
 
 Screencast
 ==========
 
-See <https://youtu.be/PSVsKcCnPF4>.
+~~See <https://youtu.be/PSVsKcCnPF4>~~. (not yet updated)
 
 Zero-Config Install and Run
 ================
@@ -32,12 +34,21 @@ pushd passport-lds-connect-example
 npm install
 ```
 
+1.5 Clone Certificates
+----------------------
+
+```bash
+# Clone the example HTTPS/SSL certificates into ./certs
+git clone https://github.com/LDSorg/local.ldsconnect.org-certificates.git ./certs
+tree -I .git ./certs
+```
+
 2. Clone Frontend
 -----------------
 
 You need to clone the frontend 
 
-See [github.com/ldsorg](https://github.com/ldsorg?query=oauth2-) for a list of frontends examples / seed projects.
+See [github.com/ldsorg](https://github.com/ldsorg?query=frontend-) for a list of frontends examples / seed projects.
 
 ```bash
 # The jQuery Example
@@ -72,72 +83,120 @@ because the way that many OAuth2 implementations validate domains requires
 having an actual domain. Also, you will be testing with **SSL on** so that
 your development environment mirrors your production environment.
 
-5. Login as dumbledore
+5. Login ~~as dumbledore~~ with your lds account
 -----------
 
-You **cannot** login as a real lds.org user as a test application.
-If you try, you will get an error.
+NOTE: the lds.io beta (lds connect v2) requires the use of an actual user account at this time.
 
-The login you must use for test applications is `dumbledore` with the passphrase `secret`.
+~~You **cannot** login as a real lds.org user as a test application.
+If you try, you will get an error.~~
 
-Create a Backend in your Favorite Language
-=====
+~~The login you must use for test applications is `dumbledore` with the passphrase `secret`.~~
 
-1. Create a backend in the language of your choice
-2. Follow the API outlined below
-3. Clone this project as your public folder
-4. Run your server, serving the public folder staticly
-
-And remember:
-
-```bash
-bower install
-```
-
-Implement this API
+API
 ===
 
-For this example **you must implement these endpoints** in your the server you create:
+* Login Success / Failure Callback
+* Open a Window
+* Test the Bearer (Access) Token
+* oauth2-close.html
 
-(replace `{{provider}}` with `facebook` or `ldsconnect` appropriately)
+NOTE: LDS Connect v2 is staged at https://lds.io, but it will be release on https://ldsconnect.org
 
-/auth/{{provider}}
+Login Success / Failure Callback
 --------------
 
-Examples:
+The browser is going to receive the token directly. In order to simplify
 
-* /auth/facebook
-* /auth/ldsconnect
+```
+window.completeLogin = function (name, url) {
+  var match;
+  var token;
 
-The endpoint you create for these may set some options in your OAuth2 library and will then redirect to
+  if (!/access_token=/.test(url)) {
+    window.alert("looks like the login failed");
+    return;
+  }
 
-  * (facebook) https://www.facebook.com/dialog/oauth
-  * (ldsconnect) https://ldsconnect.org/dialog/authorize
+  match = url.match(/(^|\#|\?|\&)access_token=([^\&]+)(\&|$)/);
+  if (!match || !match[2]) {
+    window.alert("could not parse token!");
+    return;
+  }
 
-/auth/{{provider}}/callback
+  token = match[2];
+
+  testAccessToken(token);
+};
+```
+
+Invoke the Login Dialog
 -----------------------
 
-Examples:
+```
+var myAppDomain = 'https://local.ldsconnect.org:8043';
+var myAppId = 'TEST_ID_9e78b54c44a8746a5727c972';
+var requestedScope = 'me';
 
-* /auth/facebook/callback
-* /auth/ldsconnect/callback
+var url = 'https://lds.io/oauth/dialog/authorize'
+  + '?response_type=token'
+  // WARNING: never provide a client_secret in a browser, mobile app, or desktop app
+  + '&client_id=' + myAppId
+  + '&redirect_uri=' + myAppDomain + '/oauth-close.html?type=/auth/ldsconnect/callback/'
+  + '&scope=' + encodeURIComponent(requestedScope)
+  + '&state=' + Math.random().toString().replace(/^0./, '')
+  ;
 
+window.open(url, 'ldsconnectLogin', 'height=720,width=620');
+```
 
-This is the endpoint to which facebook (or lds connect) will respond with your
-grant code (`https://example.com/auth/facebook/callback?code=xxxxxxxxxxxx`).
+**IMPORTANT:** All scopes are optional. The user may choose to deny any, or all
+of the scopes you request.
 
-Old school style would be to set this endpoint as any arbitrary string and your server
-would redirect to (hopefully) the page that your user was on with everything retemplated.
+TODO: I need to pass back a `granted_scope=` parameter in the url...
 
-However, to make for a seamless user experience, you will instead send the contents
-of `oauth-close.html` as the response (DO NOT REDIRECT) and jQuery will grab the
-session info based on the success or failure indicated in the url
-(i.e. it may be
-`https://example.com/auth/facebook/callback?error=NOT_AUTHORIZED`
-instead of having a code).
+Test the Token
+--------------
 
-Use these API Tokens
-----------
+```javascript
+function testAccessToken(token) {
+  // TODO get account list
+  return $.ajax({
+    url: "https://lds.io/api/ldsconnect/"
+      + 'undefined' // intentionally left as 'undefined'
+      + "/me"
+    , headers: {
+        Authorization: 'Bearer ' + token
+      }
+    , dataType: 'json'
+  }).then(function (data) {
+    console.info('testAccessToken response');
+    console.log(data);
+
+    if (!data) {
+      window.alert("failed to retrieve data");
+      return;
+    }
+
+    window.alert("check the console to see the data");
+    console.log(data);
+    return data;
+  });
+}
+```
+
+oauth2-close.html
+-------
+
+This file is used to handle a seemless login without taking the user
+out of their flow.
+
+It has a teeny bitsy bit of JavaScript to make sure that the login
+will work across browsers, mobile devices, and webviews, in a variety
+of OAuth2 strategies.
+
+Demo API Tokens
+===============
 
 For convenience, we provider fully working test API keys that you can test with on localhost. Get your example working first with Facebook, then substite the appropriate strings with LDS Connect.
 
@@ -148,7 +207,6 @@ For convenience, we provider fully working test API keys that you can test with 
 | OAuth2 Param     | Value                                         |
 |:------           |:------                                        |
 |Authorization URL | https://www.facebook.com/dialog/oauth         |
-| Token URL        | https://graph.facebook.com/oauth/access_token |
 | Profile URL      | https://graph.facebook.com/me                 |
 | App ID           | 746913342088510                               |
 | App Secret       | ad539732cbfbd60169f32336e257b37c              |
@@ -161,7 +219,6 @@ OAuth2 URLs and API Keys
 | OAuth2 Param     | Value                                         |
 |:------           |:------                                        |
 |Authorization URL | https://ldsconnect.org/dialog/authorize       |
-| Token URL        | https://ldsconnect.org/oauth/token            |
 | Profile URL      | https://ldsconnect.org/api/ldsconnect/me      |
 | App ID           | 55c7-test-bd03                                |
 | App Secret       | 6b2fc4f5-test-8126-64e0-b9aa0ce9a50d          |
@@ -187,8 +244,30 @@ Screencast: SSL Certificates
 
 [Getting SSL Certs with Name.com](https://www.youtube.com/watch?v=r92gqYHJc5c)
 
-FIY: Server-Side vs Client-Only OAuth2
-==============
+FYI
+====
+
+About Client-Side OAuth2
+-----
+
+The key difference with this style of OAuth2 and the better known server-side strategy
+is that it **DOES NOT use the app sercet key**.
+
+It's the perfect match for situations where you can't include your app's private key
+because users have the ability to view the source or bytecode of your app.
+
+It's also great for situations where, as a provider, you're fine with the user's data
+passing to the user's browser through an app, but your privacy policy dictates that the
+user's data should never touch an app's server (and you trust app developers to abide
+by the privacy policy).
+
+This is a template for gracefully handling the browser component of **client-side** OAuth2.
+
+An https secured server is included for convenience, but only the static file-serving feature
+is used.
+
+Server-Side vs Client-Only OAuth2
+-------
 
 Just an FYI for the curious...
 
@@ -204,3 +283,4 @@ or restricted access to a single TLS/SSL secured HTTPS domain.
 With server-side oauth2 you generally get a token that lasts longer
 (days instead of hours) and you may be able to request certain scopes
 that are not allowed to be requested by client-only oauth2 strategies.
+

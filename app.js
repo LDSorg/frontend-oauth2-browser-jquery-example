@@ -1,22 +1,49 @@
 $(function () {
   'use strict';
 
+  function setLogin(data) {
+    $('.js-login').hide();
+    $('.js-logout').show();
+    $('.js-login-dialog').modal('hide');
+    $('.js-profile').html(JSON.stringify(data, null, '  '));
+    $('.js-profile-container').fadeIn();
+
+    if (data.user && data.user.photos.length) {
+      $('img.js-headshot').attr('src', data.user.photos[0].value);
+      $('img.js-headshot').show();
+    }
+  }
+
   function testLogin() {
     $.getJSON('/account.json').then(function (data) {
       if (!data || !data.user) {
         return;
       }
 
-      $('.js-login').hide();
-      $('.js-logout').show();
-      $('.js-login-dialog').modal('hide');
-      $('.js-profile').html(JSON.stringify(data, null, '  '));
-      $('.js-profile-container').fadeIn();
+      setLogin(data);
+    });
+  }
 
-      if (data.user && data.user.photos.length) {
-        $('img.js-headshot').attr('src', data.user.photos[0].value);
-        $('img.js-headshot').show();
+  function testAccess(token) {
+    // TODO get account list
+    $.ajax({
+      url: "https://lds.io/api/ldsconnect/"
+        + 'undefined'
+        + "/me"
+    , headers: {
+        Authorization: 'Bearer ' + token
       }
+    , dataType: 'json'
+    }).then(function (data) {
+      console.info('testAccess response');
+      console.log(data);
+
+      if (!data) {
+        return;
+      }
+
+      localStorage.setItem('token', token);
+      setLogin(data);
     });
   }
 
@@ -47,15 +74,47 @@ $(function () {
 
   // all the comments above apply here as well, of course
   $('.js-open-ldsconnect-login').click('body', function () {
-    window.completeLogin = function (name, href) {
-      if (!/code=/.test(href)) {
-        window.alert("Looks like the login failed for " + name + "!");
-        return;
-      }
+    window.completeLogin = function (name, url) {
+      window.completeLogin = null;
+      var match;
+      var token;
 
-      testLogin();
+      // login was probably successful if it had a code
+      if (/code=/.test(url)) {
+        testLogin();
+      }
+      else if (/access_token=/.test(url)) {
+        match = url.match(/(^|\#|\?|\&)access_token=([^\&]+)(\&|$)/);
+        if (!match || !match[2]) {
+          throw new Error("couldn't find token!");
+        }
+
+        token = match[2];
+        testAccess(token);
+      }
+      else {
+        window.alert("looks like the login failed");
+      }
     };
-    window.open('/auth/ldsconnect');
+
+    // This would be for server-side oauth2
+    //window.open('/auth/' + name);
+
+    var myAppDomain = 'https://local.ldsconnect.org:8043';
+    var myAppId = 'TEST_ID_9e78b54c44a8746a5727c972';
+    var requestedScope = 'me';
+
+    var url = 'https://lds.io/oauth/dialog/authorize'
+      + '?response_type=token'
+      // WARNING: never provide a client_secret in a browser, mobile app, or desktop app
+      + '&client_id=' + myAppId
+      + '&redirect_uri=' + myAppDomain + '/oauth-close.html?type=/auth/ldsconnect/callback/'
+      + '&scope=' + encodeURIComponent(requestedScope)
+      + '&state=' + Math.random().toString().replace(/^0./, '')
+      ;    
+
+    // This is for client-side oauth2
+    window.open(url, 'ldsconnectLogin', 'height=720,width=620');
   });
 
   function init() {
@@ -63,7 +122,14 @@ $(function () {
     $('img.js-headshot').hide();
     $('.js-profile-container').hide();
 
-    testLogin();
+    var token = localStorage.getItem('token');
+    //var expiresAt = localStorage.getItem('tokenExpiresAt');
+
+    if (token) {
+      testAccess(token);
+    } else {
+      testLogin();
+    }
   }
 
   init();
