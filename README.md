@@ -52,7 +52,7 @@ See [github.com/ldsorg](https://github.com/ldsorg?query=frontend-) for a list of
 
 ```bash
 # The jQuery Example
-git clone git@github.com:LDSorg/oauth2-jquery public
+git clone https://github.com/LDSorg/frontend-oauth2-browser-jquery-example.git public
 ```
 
 3. Run Server
