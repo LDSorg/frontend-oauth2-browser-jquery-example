@@ -1,16 +1,17 @@
 <script>
-  var re = /\/auth\/([^\/]+)\/callback/
+  var re = /\/(auth|providers)\/([^\/]+)\/callback/
     , href = window.location.href
     , m
     , name
     ;
 
   m = href.match(re);
-  name = m[1]
 
   if (!m) {
     window.alert("callback URLs should be in the format /auth/{{strategy}}/callback");
   }
+
+  name = m[1]
 
   setTimeout(function () {
     window.opener.completeLogin(name, window.location.href);

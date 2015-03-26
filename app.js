@@ -104,7 +104,7 @@ $(function () {
     var myAppId = 'TEST_ID_9e78b54c44a8746a5727c972';
     var requestedScope = 'me';
 
-    var url = 'https://lds.io/oauth/dialog/authorize'
+    var url = 'https://lds.io/api/oauth3/authorization_dialog'
       + '?response_type=token'
       // WARNING: never provide a client_secret in a browser, mobile app, or desktop app
       + '&client_id=' + myAppId
