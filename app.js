@@ -114,7 +114,7 @@ $(function () {
       ;    
 
     // This is for client-side oauth2
-    window.open(url, 'ldsconnectLogin', 'height=720,width=620');
+    window.open(url, 'ldsconnect.orgLogin', 'height=720,width=620');
   });
 
   function init() {
