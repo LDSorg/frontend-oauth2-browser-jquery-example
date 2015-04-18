@@ -11,11 +11,13 @@ $(function () {
   // **before** you handle the click event that opens the login dialog
   // (otherwise the browser security policy will prevent the popup)
   //
-  Oauth3.discover("https://ldsconnect.org").then(function () {
-    console.log("I'm ready to handle login click events for https://ldsconnect.org");
-  }, function () {
-    window.alert("https://ldsconnect.org does not support oauth3 or is currently unavailable");
-  });
+  function discover() {
+    Oauth3.discover("https://ldsconnect.org").then(function () {
+      console.log("I'm ready to handle login click events for https://ldsconnect.org");
+    }, function () {
+      window.alert("https://ldsconnect.org does not support oauth3 or is currently unavailable");
+    });
+  }
   // TODO needs failover to oauth3.org for sites that don't support oauth3 yet
   // Oauth3.discover("https://facebook.com")
 
@@ -65,7 +67,8 @@ $(function () {
     ).then(function (params) {
       console.log('[lds implicit grant]', params);
       testLdsAccess(params.access_token);
-    }, function () {
+    }, function (err) {
+      console.error(err);
       window.alert('Implicit Grant Login Failed');
     });
   });
@@ -75,7 +78,8 @@ $(function () {
     , { authorizationRedirect: true, scope: 'directories' }
     ).then(function (params) {
       testLdsAccess(params.access_token);
-    }, function () {
+    }, function (err) {
+      console.error(err);
       window.alert('Authorization Redirect Login Failed');
     });
   });
@@ -173,6 +177,7 @@ $(function () {
   }
 
   function init() {
+    discover();
     $('.js-login').show();
     $('.js-logout').hide();
     $('img.js-headshot').hide();
