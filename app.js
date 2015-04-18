@@ -1,6 +1,164 @@
 $(function () {
   'use strict';
 
+  var Oauth3 = window.OAUTH3;
+
+  //
+  // IMPORTANT Discovering OAuth3 Service
+  //
+  // In the next version I'll enabled discovery automatically when .login()
+  // is called, but for now you should call it manually and it should complete
+  // **before** you handle the click event that opens the login dialog
+  // (otherwise the browser security policy will prevent the popup)
+  //
+  Oauth3.discover("https://ldsconnect.org").then(function () {
+    console.log("I'm ready to handle login click events for https://ldsconnect.org");
+  }, function () {
+    window.alert("https://ldsconnect.org does not support oauth3 or is currently unavailable");
+  });
+  // TODO needs failover to oauth3.org for sites that don't support oauth3 yet
+  // Oauth3.discover("https://facebook.com")
+
+  //
+  // Background Login
+  //
+  // You could also perform a background login which will
+  // invoke the discovery and is not inhibited by it.
+  //
+  /*
+  Oauth3.backgroundLogin(
+    "https://ldsconnect.org"
+  , { authorizationRedirect: true, scope: 'directories' }
+  ).then(function (params) {
+    console.log("The user is logged in to ldsconnect.org and has already accepted permissions");
+    testLdsAccess(params.access_token);
+  }, function (err) {
+    console.warn(err);
+    console.log("The user is either not logged in to ldsconnect.org or has not granted the desired scope");
+  });
+  */
+
+  //
+  // Login Click Handler
+  //
+  // The call to login must be attached to click handler otherwise
+  // the browser security policy will block window.open from creating a popup.
+  // Also, the chain leading up to window.open must be synchronous
+  // (I think setTimeout / setImmediate is okay, but ajax and other events
+  // will cause the click to lose its ability to open popups)
+  //
+  // Note: In a future version I will support iframes, but I have to implement
+  //       an anti-click-jacking security measure first.
+  //
+  function login(providerUri, opts) {
+    opts.type = 'popup';
+    return Oauth3.login(providerUri, opts);
+  }
+
+  //
+  // LDS Account
+  //
+  $('.js-open-ldsconnect-implicit-grant').click('body', function () {
+    login(
+      'https://ldsconnect.org'
+    , { appId: 'TEST_ID_beba4219ee9e9edac8a75237', scope: 'directories' }
+    ).then(function (params) {
+      console.log('[lds implicit grant]', params);
+      testLdsAccess(params.access_token);
+    }, function () {
+      window.alert('Implicit Grant Login Failed');
+    });
+  });
+  $('.js-open-ldsconnect-authorization-redirect').click('body', function () {
+    login(
+      'https://ldsconnect.org'
+    , { authorizationRedirect: true, scope: 'directories' }
+    ).then(function (params) {
+      testLdsAccess(params.access_token);
+    }, function () {
+      window.alert('Authorization Redirect Login Failed');
+    });
+  });
+
+  //
+  // Facebook
+  //
+  var fbDirectives = {
+    "authorization_dialog": {
+      "method": "GET"
+    , "url": "https://www.facebook.com/dialog/oauth"
+    }
+  , "access_token": {
+      "method": "POST"
+    , "url": "https://graph.facebook.com/oauth/access_token"
+    }
+  , "profile": {
+      "method": "GET"
+    , "url": "https://graph.facebook.com/me"
+    }
+  , "authn_scope": ""
+  };
+
+  $('.js-open-facebook-implicit-grant').click('body', function () {
+    login('https://facebook.com', { appId: '1592518370979179', directives: fbDirectives }).then(function () {
+      window.alert('Implicit Grant fb login success');
+    }, function () {
+      window.alert('FAIL: Implicit Grant fb login failure');
+    });
+  });
+  $('.js-open-facebook-authorization-redirect').click('body', function () {
+    login('https://facebook.com', { authorizationRedirect: true, directives: fbDirectives }).then(function () {
+      window.alert('Authorization Redirect fb login success');
+    }, function () {
+      window.alert('FAIL: Authorization Redirect fb login failure');
+    });
+  });
+
+  function testLdsAccess(token) {
+    // TODO get account list
+    $.ajax({
+      url: "https://lds.io/api/ldsio/accounts"
+    , headers: {
+        Authorization: 'Bearer ' + token
+      }
+    , dataType: 'json'
+    }).then(function (data) {
+      console.info('testLdsAccess response');
+      console.log(data);
+
+      if (!data || !data.accounts) {
+        return;
+      }
+
+      $.ajax({
+        url: 'https://lds.io/api/ldsio/' + data.accounts[0].app_scoped_id + '/me'
+      , headers: {
+          Authorization: 'Bearer ' + token
+        }
+      , dataType: 'json'
+      }).then(function (data) {
+        console.info('testLdsAccess profile response');
+        console.log(data);
+
+        // Saving the session in the client so we know we're already logged in
+        localStorage.setItem('token', token);
+        setLogin(data);
+      });
+    });
+  }
+
+  $('.js-logout').click('body', function (ev) {
+    ev.stopPropagation();
+    ev.preventDefault();
+
+    // TODO needs directive
+    // Oauth3.logout('https://facebook.com');
+    Oauth3.logout('https://ldsconnect.org').then(function () {
+      localStorage.clear();
+      init();
+    });
+  });
+
   function setLogin(data) {
     $('.js-login').hide();
     $('.js-logout').show();
@@ -14,121 +172,18 @@ $(function () {
     }
   }
 
-  function testLogin() {
-    $.getJSON('/account.json').then(function (data) {
-      if (!data || !data.user) {
-        return;
-      }
-
-      setLogin(data);
-    });
-  }
-
-  function testAccess(token) {
-    // TODO get account list
-    $.ajax({
-      url: "https://lds.io/api/ldsconnect/"
-        + 'undefined'
-        + "/me"
-    , headers: {
-        Authorization: 'Bearer ' + token
-      }
-    , dataType: 'json'
-    }).then(function (data) {
-      console.info('testAccess response');
-      console.log(data);
-
-      if (!data) {
-        return;
-      }
-
-      localStorage.setItem('token', token);
-      setLogin(data);
-    });
-  }
-
-  $('.js-open-facebook-login').click('body', function () {
-    // handling this in the browser instead of on the server
-    // means swapping a redirect for an http request,
-    // so don't believe an fanatic's fallacy that this is slower.
-    window.completeLogin = function (name, href) {
-      // name can be used to disambiguate if you have multiple login strategies
-      // href will contain 'code', 'token', or an error you may want to display to the user
-      if (!/code=/.test(href)) {
-        window.alert("Looks like the login failed for " + name + "!");
-        return;
-      }
-
-      testLogin();
-    };
-
-    // Due to security issues surrounding iframes (click-jacking, etc),
-    // we currently only support opening a new window for OAuth2.
-    // Admitedly, it's a little more visual distracting that the normal double-redirect,
-    // but that makes it much more difficult to bring the user back to their present experience
-    // so we highly recommend this method.
-    // Once the security issues are figured out, we'll support iframes (like facebook)
-    window.open('/auth/facebook');
-    // alternate method <iframe src="frame.htm" allowtransparency="true">
-  });
-
-  // all the comments above apply here as well, of course
-  $('.js-open-ldsconnect-login').click('body', function () {
-    window.completeLogin = function (name, url) {
-      window.completeLogin = null;
-      var match;
-      var token;
-
-      // login was probably successful if it had a code
-      if (/code=/.test(url)) {
-        testLogin();
-      }
-      else if (/access_token=/.test(url)) {
-        match = url.match(/(^|\#|\?|\&)access_token=([^\&]+)(\&|$)/);
-        if (!match || !match[2]) {
-          throw new Error("couldn't find token!");
-        }
-
-        token = match[2];
-        testAccess(token);
-      }
-      else {
-        window.alert("looks like the login failed");
-      }
-    };
-
-    // This would be for server-side oauth2
-    //window.open('/auth/' + name);
-
-    var myAppDomain = 'https://local.ldsconnect.org:8043';
-    var myAppId = 'TEST_ID_9e78b54c44a8746a5727c972';
-    var requestedScope = 'me';
-
-    var url = 'https://lds.io/api/oauth3/authorization_dialog'
-      + '?response_type=token'
-      // WARNING: never provide a client_secret in a browser, mobile app, or desktop app
-      + '&client_id=' + myAppId
-      + '&redirect_uri=' + myAppDomain + '/oauth-close.html?type=/auth/ldsconnect/callback/'
-      + '&scope=' + encodeURIComponent(requestedScope)
-      + '&state=' + Math.random().toString().replace(/^0./, '')
-      ;    
-
-    // This is for client-side oauth2
-    window.open(url, 'ldsconnect.orgLogin', 'height=720,width=620');
-  });
-
   function init() {
+    $('.js-login').show();
     $('.js-logout').hide();
     $('img.js-headshot').hide();
     $('.js-profile-container').hide();
 
-    var token = localStorage.getItem('token');
+    // checking to see if we're already logged in
+    var token = localStorage.getItem('lds.io.token');
     //var expiresAt = localStorage.getItem('tokenExpiresAt');
 
     if (token) {
-      testAccess(token);
-    } else {
-      testLogin();
+      testLdsAccess(token);
     }
   }
 
